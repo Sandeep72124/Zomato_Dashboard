@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Devices</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <style>
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+       position: absolute;
+      right: 0;
+      background-color: #fff;
+      min-width: 120px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border-radius: 6px;
+      z-index: 10;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 8px 12px;
+      color: #374151;
+      font-size: 14px;
+    }
+    .dropdown-content a:hover {
+      background-color: #f3f4f6;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-green-700 text-purple-100 flex-shrink-0 overflow-y-auto">
+      <div class="p-4 border-b border-white-800">
+        <h1 class="text-2xl font-bold flex items-center">
+          <i data-feather="package" class="mr-2"></i>
+          Frinso Tech
+        </h1>
+      </div>
+      <nav class="mt-4">
+       <a href="Dashboard.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
+  <i data-feather="bar-chart-2" class="mr-3"></i> Overview
+</a>
+
+
+           <a href="Device.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
+  <i data-feather="user" class="mr-3"></i> Device
+</a>
+
+           <a href="Report.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
+  <i data-feather="cpu" class="mr-3"></i> Report
+</a>
+
+           <a href="Alert.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
+  <i data-feather="bell" class="mr-3"></i> Alert
+</a>
+
+        <a href="Entry.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
+  <i data-feather="book" class="mr-3"></i> Manual Entry
+</a>
+
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+       <header class="p-4 flex items-center justify-left bg-gradient-to-r from-green-400 via-yellow-300 to-red-400">
+        <h2 class="text-3xl font-bold">Devices </h2>
+      </header>
+
+      <main class="p-6 overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Device List</h3>
+          <table class="min-w-full border border-gray-200 rounded-lg">
+            <thead class="bg-yellow-500 text-white">
+              <tr>
+                <th class="py-2 px-4 text-left">IMEI No</th>
+                <th class="py-2 px-4 text-left">Device Name</th>
+                <th class="py-2 px-4 text-left">Device Alias</th>
+                <th class="py-2 px-4 text-left">Location (lat,long)</th>
+                <th class="py-2 px-4 text-left">Status</th>
+                <th class="py-2 px-4 text-left">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-t hover:bg-gray-50">
+                <td class="py-2 px-4">868997051234567</td>
+                <td class="py-2 px-4">DG Controller</td>
+                <td class="py-2 px-4">Main DG</td>
+                <td class="py-2 px-4">21.1458, 79.0882</td>
+                <td class="py-2 px-4 text-green-600 font-bold">Online</td>
+                <td class="py-2 px-4">
+                  <div class="dropdown">
+                    <button class="p-1 rounded hover:bg-gray-200">
+                      <i data-feather="more-vertical"></i>
+                    </button>
+                    <div class="dropdown-content">
+                      <a href="Data.html">Data</a>
+                     
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-t hover:bg-gray-50">
+                <td class="py-2 px-4">868997051234568</td>
+                <td class="py-2 px-4">DG Monitor</td>
+                <td class="py-2 px-4">Backup DG</td>
+                <td class="py-2 px-4">19.0760, 72.8777</td>
+                <td class="py-2 px-4 text-red-600 font-bold">Offline</td>
+                <td class="py-2 px-4">
+                  <div class="dropdown">
+                    <button class="p-1 rounded hover:bg-gray-200">
+                      <i data-feather="more-vertical"></i>
+                    </button>
+                    <div class="dropdown-content">
+                      <a href="Data.html">Data</a>
+                      
+                      
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>feather.replace()</script>
+</body>
+</html>

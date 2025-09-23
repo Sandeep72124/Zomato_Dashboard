@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <style>
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #fff;
+      min-width: 120px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border-radius: 6px;
+      z-index: 10;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 8px 12px;
+      color: #374151;
+      font-size: 14px;
+    }
+    .dropdown-content a:hover {
+      background-color: #f3f4f6;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+    .modal.active { display: flex; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-green-700 text-purple-100 flex-shrink-0 overflow-y-auto">
+      <div class="p-4 border-b border-white-800">
+        <h1 class="text-2xl font-bold flex items-center">
+          <i data-feather="package" class="mr-2"></i>
+          Frinso Tech
+        </h1>
+      </div>
+      <nav class="mt-4">
+        <a href="Dashboard.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
+          <i data-feather="bar-chart-2" class="mr-3"></i> Dashboard
+        </a>
+        <a href="Device.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
+          <i data-feather="user" class="mr-3"></i> Device
+        </a>
+        <a href="Report.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
+          <i data-feather="cpu" class="mr-3"></i> Report
+        </a>
+        <a href="Alert.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
+          <i data-feather="bell" class="mr-3"></i> Alert
+        </a>
+        <a href="Entry.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
+          <i data-feather="book" class="mr-3"></i> Manual Entry
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+      <!-- Header -->
+      <header class="p-4 flex items-center justify-between bg-gradient-to-r from-green-400 via-yellow-300 to-red-400">
+        <h2 class="text-3xl font-bold">DG Alerts & Notifications</h2>
+        <button id="addBtn" class="flex items-center bg-teal-700 text-white px-3 py-2 rounded">
+          <span class="mr-1 text-xl font-bold">+</span> ADD
+        </button>
+      </header>
+
+      <!-- Table Section -->
+      <div class="p-6 flex-1 overflow-y-auto">
+        <table class="w-full border border-gray-300 bg-white">
+          <thead class="bg-gray-800 text-white">
+            <tr>
+              <th class="p-2">Device</th>
+              <th class="p-2">Parameter</th>
+              <th class="p-2">Condition</th>
+              <th class="p-2">Value</th>
+              <th class="p-2">Email</th>
+              <th class="p-2">Phone</th>
+              <th class="p-2">Action</th>
+            </tr>
+          </thead>
+          <tbody id="alertTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="alertModal" class="modal">
+    <div class="bg-white p-6 rounded shadow-lg w-96">
+      <h2 id="modalTitle" class="text-xl font-bold mb-4">Create Alert</h2>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block mb-1">Device</label>
+          <select id="device" class="w-full border p-2">
+            <option>DG Set 1</option>
+            <option>DG Set 2</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1">Parameter</label>
+          <select id="parameter" class="w-full border p-2">
+            <option>Power Supply</option>
+            <option>Fuel Level</option>
+            <option>Oil Pressure</option>
+            <option>Temperature</option>
+            <option>Battery Status</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1">Condition</label>
+          <select id="condition" class="w-full border p-2">
+            <option>Normal</option>
+            <option>Low</option>
+            <option>Critical</option>
+            <option><</option>
+            <option>></option>
+            <option>=</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1">Set Value</label>
+          <input id="setValue" type="text" class="w-full border p-2" placeholder="Enter value (e.g., 30%)">
+        </div>
+
+        <div>
+          <label class="block mb-1">Email</label>
+          <input id="email" type="email" class="w-full border p-2">
+        </div>
+
+        <div>
+          <label class="block mb-1">Phone</label>
+          <input id="phone" type="text" class="w-full border p-2">
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-4 space-x-2">
+        <button id="cancelBtn" class="bg-gray-400 text-white px-4 py-2 rounded">Cancel</button>
+        <button id="saveBtn" class="bg-green-600 text-white px-4 py-2 rounded">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    feather.replace();
+
+    const addBtn = document.getElementById("addBtn");
+    const alertModal = document.getElementById("alertModal");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const alertTable = document.getElementById("alertTable");
+    const modalTitle = document.getElementById("modalTitle");
+
+    let editRow = null;
+
+    // Show modal for Add
+    addBtn.addEventListener("click", () => {
+      modalTitle.textContent = "Create Alert";
+      saveBtn.textContent = "Submit";
+      editRow = null;
+      clearForm();
+      alertModal.classList.add("active");
+    });
+
+    // Cancel
+    cancelBtn.addEventListener("click", () => {
+      alertModal.classList.remove("active");
+    });
+
+    // Save (Add or Edit)
+    saveBtn.addEventListener("click", () => {
+      const device = document.getElementById("device").value;
+      const parameter = document.getElementById("parameter").value;
+      const condition = document.getElementById("condition").value;
+      const setValue = document.getElementById("setValue").value;
+      const email = document.getElementById("email").value;
+      const phone = document.getElementById("phone").value;
+
+      if (!device || !parameter || !condition || !setValue) {
+        alert("Please fill all required fields!");
+        return;
+      }
+
+      if (editRow) {
+        editRow.cells[0].textContent = device;
+        editRow.cells[1].textContent = parameter;
+        editRow.cells[2].textContent = condition;
+        editRow.cells[3].textContent = setValue;
+        editRow.cells[4].textContent = email;
+        editRow.cells[5].textContent = phone;
+        editRow = null;
+      } else {
+        const row = alertTable.insertRow();
+        row.innerHTML = `
+          <td class="p-2">${device}</td>
+          <td class="p-2">${parameter}</td>
+          <td class="p-2">${condition}</td>
+          <td class="p-2">${setValue}</td>
+          <td class="p-2">${email}</td>
+          <td class="p-2">${phone}</td>
+          <td class="p-2 space-x-2">
+            <button class="bg-blue-500 text-white px-2 py-1 rounded editBtn">Edit</button>
+            <button class="bg-red-500 text-white px-2 py-1 rounded" onclick="this.closest('tr').remove()">Delete</button>
+          </td>
+        `;
+      }
+
+      alertModal.classList.remove("active");
+    });
+
+    // Edit Button
+    alertTable.addEventListener("click", (e) => {
+      if (e.target.classList.contains("editBtn")) {
+        editRow = e.target.closest("tr");
+        modalTitle.textContent = "Edit Alert";
+        saveBtn.textContent = "Update";
+
+        document.getElementById("device").value = editRow.cells[0].textContent;
+        document.getElementById("parameter").value = editRow.cells[1].textContent;
+        document.getElementById("condition").value = editRow.cells[2].textContent;
+        document.getElementById("setValue").value = editRow.cells[3].textContent;
+        document.getElementById("email").value = editRow.cells[4].textContent;
+        document.getElementById("phone").value = editRow.cells[5].textContent;
+
+        alertModal.classList.add("active");
+      }
+    });
+
+    // Clear form
+    function clearForm() {
+      document.getElementById("device").value = "DG Set 1";
+      document.getElementById("parameter").value = "Power Supply";
+      document.getElementById("condition").value = "Normal";
+      document.getElementById("setValue").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("phone").value = "";
+    }
+  </script>
+</body>
+</html>

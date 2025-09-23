@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+ 
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <style>
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #fff;
+      min-width: 120px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border-radius: 6px;
+      z-index: 10;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 8px 12px;
+      color: #374151;
+      font-size: 14px;
+    }
+    .dropdown-content a:hover {
+      background-color: #f3f4f6;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .blink { animation: blink 1s infinite; }
+    @keyframes blink { 50% { background-color: #fca5a5; } }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-green-700 text-purple-100 flex-shrink-0 overflow-y-auto">
+      <div class="p-4 border-b border-white-800">
+        <h1 class="text-2xl font-bold flex items-center">
+          <i data-feather="package" class="mr-2"></i>
+          Frinso Tech
+        </h1>
+      </div>
+      <nav class="mt-4">
+        <a href="Dashboard.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="bar-chart-2" class="mr-3"></i> Dashboard
+        </a>
+        <a href="Device.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="user" class="mr-3"></i> Device
+        </a>
+        <a href="Report.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="cpu" class="mr-3"></i> Report
+        </a>
+        <a href="Alert.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="bell" class="mr-3"></i> Alert
+        </a>
+        <a href="Entry.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="book" class="mr-3"></i> Manual Entry
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+      <!-- Header with Profile -->
+      <header class="p-4 flex items-center justify-between bg-gradient-to-r from-green-400 via-yellow-300 to-red-400">
+        <h2 class="text-3xl font-bold">Dashboard</h2>
+    
+        <div class="relative">
+         
+          <button id="profileBtn" class="flex items-center space-x-2">
+            
+            <div class="text-left">
+              <p id="userName" class="font-bold"></p>
+              <p id="userEmail" class="text-sm text-gray-700"></p>
+            </div>
+            <i data-feather="chevron-down"></i>
+          </button>
+          <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 bg-white rounded shadow-lg border">
+            <button onclick="logout()" class="w-full flex items-center px-4 py-2 hover:bg-gray-100 text-red-600">
+              <i data-feather="log-out" class="mr-2"></i> Log Out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Filters -->
+      <div class="bg-green-100 p-4 flex space-x-4 border-b">
+        <select id="stateFilter" class="p-2 border border-red-600 rounded-lg">
+          <option value="">Select State</option>
+        </select>
+        <select id="cityFilter" class="p-2 border border-green-600 rounded-lg">
+          <option value="">Select City</option>
+        </select>
+        <select id="zoneFilter" class="p-2 border border-yellow-500 rounded-lg">
+          <option value="">Select Zone</option>
+        </select>
+      </div>
+
+      <!-- Content Area -->
+      <main class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- DG Status -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-yellow-500 hover:shadow-2xl transition">
+          <h1 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
+            <i data-feather="cpu" class="mr-2 text-green-600"></i> DG Status
+          </h1>
+          <div class="space-y-3">
+            <div class="bg-yellow-300 shadow rounded-lg p-2 flex flex-col items-center justify-center">
+              <h3 class="text-2xl font-semibold">Active Devices</h3>
+              <p id="activeCount" class="text-green-600 text-2xl font-bold">7</p>
+            </div>
+            <div class="bg-blue-400 shadow rounded-lg p-2 flex flex-col items-center justify-center">
+              <h3 class="text-2xl font-semibold">Inactive Devices</h3>
+              <p id="inactiveCount" class="text-red-600 text-2xl font-bold">0</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disruptions -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-red-500 hover:shadow-2xl transition">
+          <h3 class="text-2xl font-bold mb-4">Total Disruptions</h3>
+          <table id="disruptionTable" class="w-full mt-4 border">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="p-2 text-left">Device Name</th>
+                <th class="p-2 text-left">Power</th>
+                <th class="p-2 text-left">Fuel</th>
+                <th class="p-2 text-left">Oil Pressure</th>
+                <th class="p-2 text-left">Temp</th>
+                <th class="p-2 text-left">Battery</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-problems="2" class="cursor-pointer hover:bg-gray-100" onclick="openDevice('FT_500718')">
+                <td class="p-2 text-blue-600 underline">FT_500718</td>
+                <td class="p-2 text-green-600">Normal</td>
+                <td class="p-2 text-yellow-500">Low (30%)</td>
+                <td class="p-2 text-red-600">Critical</td>
+                <td class="p-2 text-green-600">45°C</td>
+                <td class="p-2 text-green-600">Charged</td>
+              </tr>
+              <tr data-problems="0" class="cursor-pointer hover:bg-gray-100" onclick="openDevice('FT_500961')">
+                <td class="p-2 text-blue-600 underline">FT_500961</td>
+                <td class="p-2 text-green-600">Normal</td>
+                <td class="p-2 text-green-600">Normal</td>
+                <td class="p-2 text-green-600">Normal</td>
+                <td class="p-2 text-green-600">46°C</td>
+                <td class="p-2 text-green-600">Charged</td>
+              </tr>
+              <tr data-problems="2" class="cursor-pointer hover:bg-gray-100" onclick="openDevice('FT_500166')">
+                <td class="p-2 text-blue-600 underline">FT_500166</td>
+                <td class="p-2 text-green-600">Normal</td>
+                <td class="p-2 text-yellow-500">Low (40%)</td>
+                <td class="p-2 text-red-600">Critical</td>
+                <td class="p-2 text-green-600">44°C</td>
+                <td class="p-2 text-green-600">Charged</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Devices -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-blue-500 hover:shadow-2xl transition">
+          <h3 class="text-2xl font-bold mb-4">Devices</h3>
+          <table class="w-full mt-4 border">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="p-2 text-left">Device Name</th>
+                <th class="p-2 text-left">Device Alias</th>
+                <th class="p-2 text-left">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="hover:bg-gray-100 cursor-pointer" onclick="openDevice('FT_500718')">
+                <td class="p-2 text-blue-600 underline">FT_500718</td>
+                <td class="p-2">Gousiya nagara ultrasonic GPR tank</td>
+                <td class="p-2"><span class="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">Active</span></td>
+              </tr>
+              <tr class="hover:bg-gray-100 cursor-pointer" onclick="openDevice('FT_500961')">
+                <td class="p-2 text-blue-600 underline">FT_500961</td>
+                <td class="p-2">Udayagiri devanur tank</td>
+                <td class="p-2"><span class="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">Active</span></td>
+              </tr>
+              <tr class="hover:bg-gray-100 cursor-pointer" onclick="openDevice('FT_500166')">
+                <td class="p-2 text-blue-600 underline">FT_500166</td>
+                <td class="p-2">Jalpuri tank EMF</td>
+                <td class="p-2"><span class="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">Active</span></td>
+              </tr>
+              <tr class="hover:bg-gray-100 cursor-pointer" onclick="openDevice('FT_500711')">
+                <td class="p-2 text-blue-600 underline">FT_500711</td>
+                <td class="p-2">Halanahalli line GPR tank EMF</td>
+                <td class="p-2"><span class="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">Active</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Map -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-purple-500 hover:shadow-2xl transition">
+          <h3 class="text-2xl font-bold mb-4">Device Locations</h3>
+          <div id="map" class="w-full h-80 rounded-lg"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Google Maps -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmCPXYwFoFiYDaNZ2MvxBB7tq3PYGpp1o"></script>
+  <script>
+    feather.replace();
+
+    const profileBtn = document.getElementById("profileBtn");
+    const profileMenu = document.getElementById("profileMenu");
+
+    profileBtn.addEventListener("click", () => {
+      profileMenu.classList.toggle("hidden");
+    });
+
+    // Get user data dynamically (from localStorage after login)
+    const userName = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail");
+
+    if (userName && userEmail) {
+      document.getElementById("userName").textContent = userName;
+      document.getElementById("userEmail").textContent = userEmail;
+    } else {
+      // If no user logged in → redirect to login
+      window.location.href = "index.html";
+    }
+
+    function logout() {
+      localStorage.clear(); // clear login data
+      window.location.href = "index.html"; // redirect to login
+    }
+
+    // Example device data with lat/lng and problem counts
+    const devices = {
+      FT_500718: { name: 'FT_500718', lat: 19.076, lng: 72.8777, problems: 2 },
+      FT_500961: { name: 'FT_500961', lat: 28.7041, lng: 77.1025, problems: 0 },
+      FT_500166: { name: 'FT_500166', lat: 21.1458, lng: 79.0882, problems: 2 },
+      FT_500711: { name: 'FT_500711', lat: 12.9716, lng: 77.5946, problems: 0 }
+    };
+    // Your Firebase config (console se copy karke paste karo)
+
+
+
+    let map;
+    let markers = {};
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 22.9734, lng: 78.6569 },
+        zoom: 5
+      });
+
+      for (let key in devices) {
+        const device = devices[key];
+        const marker = new google.maps.Marker({
+          position: { lat: device.lat, lng: device.lng },
+          map: map,
+          title: device.name
+        });
+        markers[key] = marker;
+      }
+    }
+
+    window.onload = function() {
+      initMap();
+      sortDisruptions();
+    }
+
+    function sortDisruptions() {
+      const tbody = document.querySelector('#disruptionTable tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.sort((a, b) => b.dataset.problems - a.dataset.problems);
+      rows.forEach(row => tbody.appendChild(row));
+    }
+
+    function openDevice(id) {
+      window.location = `Overviews.html?id=${id}`;
+      blinkMarker(id);
+    }
+
+    function blinkMarker(id) {
+      if (markers[id]) {
+        markers[id].setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => markers[id].setAnimation(null), 3000);
+      }
+    }
+
+    // Filters (dummy example: filter by state/city/zone)
+    document.getElementById('stateFilter').addEventListener('change', filterDevices);
+    document.getElementById('cityFilter').addEventListener('change', filterDevices);
+    document.getElementById('zoneFilter').addEventListener('change', filterDevices);
+
+    function filterDevices() {
+      console.log('Filtering by:', {
+        state: document.getElementById('stateFilter').value,
+        city: document.getElementById('cityFilter').value,
+        zone: document.getElementById('zoneFilter').value
+      });
+    }
+    const firebaseConfig = {
+   apiKey: "AIzaSyB4yz1uGoIsdGskjpw8Sd_l11DRwEp9bm8",
+  authDomain: "dashboard-5ad70.firebaseapp.com",
+  databaseURL: "https://dashboard-5ad70-default-rtdb.firebaseio.com",
+  projectId: "dashboard-5ad70",
+  storageBucket: "dashboard-5ad70.firebasestorage.app",
+  messagingSenderId: "271639896344",
+  appId: "1:271639896344:web:fdc6b2d3820b099f96be6d",
+  };
+
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Real-time listener for all devices
+  const devicesRef = db.ref("devices");
+
+  devicesRef.on("value", (snapshot) => {
+    const devices = snapshot.val();
+    const tbody = document.querySelector("#disruptionTable tbody");
+    tbody.innerHTML = ""; // Clear old rows
+
+    if (devices) {
+      Object.keys(devices).forEach((id) => {
+        const d = devices[id];
+        const row = `
+          <tr>
+            <td class="p-2 text-blue-600 underline">${id}</td>
+            <td class="p-2 ${d.power === "Normal" ? "text-green-600" : "text-red-600"}">${d.power}</td>
+            <td class="p-2 ${d.fuel.includes("Low") ? "text-yellow-500" : "text-green-600"}">${d.fuel}</td>
+            <td class="p-2 ${d.oil === "Critical" ? "text-red-600" : "text-green-600"}">${d.oil}</td>
+            <td class="p-2 text-green-600">${d.temp}</td>
+            <td class="p-2 text-green-600">${d.battery}</td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+  });
+  const stateSelect = document.getElementById("stateFilter");
+const citySelect = document.getElementById("cityFilter");
+const zoneSelect = document.getElementById("zoneFilter");
+
+const locationsRef = db.ref("locations");
+
+// Load states
+locationsRef.once("value", (snapshot) => {
+  const states = Object.keys(snapshot.val() || {});
+  states.forEach((state) => {
+    stateSelect.innerHTML += `<option value="${state}">${state}</option>`;
+  });
+});
+
+// On state change → load cities
+stateSelect.addEventListener("change", () => {
+  citySelect.innerHTML = `<option value="">Select City</option>`;
+  zoneSelect.innerHTML = `<option value="">Select Zone</option>`;
+
+  locationsRef.child(stateSelect.value).once("value", (snapshot) => {
+    const cities = Object.keys(snapshot.val() || {});
+    cities.forEach((city) => {
+      citySelect.innerHTML += `<option value="${city}">${city}</option>`;
+    });
+  });
+});
+
+// On city change → load zones
+citySelect.addEventListener("change", () => {
+  zoneSelect.innerHTML = `<option value="">Select Zone</option>`;
+
+  locationsRef.child(`${stateSelect.value}/${citySelect.value}`).once("value", (snapshot) => {
+    const zones = Object.keys(snapshot.val() || {});
+    zones.forEach((zone) => {
+      zoneSelect.innerHTML += `<option value="${zone}">${zone}</option>`;
+    });
+  });
+});
+
+// On zone change → load sites & show devices
+zoneSelect.addEventListener("change", () => {
+  const siteRef = locationsRef.child(`${stateSelect.value}/${citySelect.value}/${zoneSelect.value}`);
+
+  siteRef.once("value", (snapshot) => {
+  const sites = snapshot.val();
+  const tbody = document.querySelector("#disruptionTable tbody");
+  tbody.innerHTML = "";
+
+  Object.keys(sites || {}).forEach((site) => {
+    const { deviceid, alias } = sites[site];   // lowercase
+    const deviceId = deviceid;
+
+    db.ref("devices/" + deviceId).once("value").then((snap) => {
+      const d = snap.val();
+      if (!d) {
+        console.warn("⚠️ Device not found:", deviceId);
+        return;
+      }
+
+      const row = `
+        <tr>
+          <td class="p-2 text-blue-600 underline">${alias} (${deviceId})</td>
+          <td class="p-2 ${d.power === "Normal" ? "text-green-600" : "text-red-600"}">${d.power}</td>
+          <td class="p-2 ${d.fuel.includes("Low") ? "text-yellow-500" : "text-green-600"}">${d.fuel}</td>
+          <td class="p-2 ${d.oil === "Critical" ? "text-red-600" : "text-green-600"}">${d.oil}</td>
+          <td class="p-2 text-green-600">${d.temp}</td>
+          <td class="p-2 text-green-600">${d.battery}</td>
+        </tr>
+      `;
+      tbody.innerHTML += row;
+    });
+  });
+});
+
+});
+
+  </script>
+</body>
+</html>

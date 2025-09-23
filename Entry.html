@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manual Entry</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-green-700 text-purple-100 flex-shrink-0 overflow-y-auto">
+      <div class="p-4 border-b border-white-800">
+        <h1 class="text-2xl font-bold flex items-center">
+          <i data-feather="package" class="mr-2"></i>
+          Frinso Tech
+        </h1>
+      </div>
+      <nav class="mt-4">
+        <a href="Dashboard.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="bar-chart-2" class="mr-3"></i> Overview
+        </a>
+        <a href="Device.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="user" class="mr-3"></i> Device
+        </a>
+        <a href="Report.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="cpu" class="mr-3"></i> Report
+        </a>
+        <a href="Alert.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="bell" class="mr-3"></i> Alert
+        </a>
+        <a href="Entry.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="book" class="mr-3"></i> Manual Entry
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+      <header class="p-4 flex items-center justify-left bg-gradient-to-r from-green-400 via-yellow-300 to-red-400">
+        <h2 class="text-3xl font-bold">Manual Entry</h2>
+      </header>
+
+      <!-- Vendor Form + Table -->
+      <div class="p-6">
+        <div class="bg-white shadow-lg rounded-lg p-6">
+          <!-- Form -->
+          <h3 class="text-xl font-semibold mb-4">Add Vendor</h3>
+          <form id="vendorForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label class="block text-gray-700 mb-1">Vendor Name</label>
+              <input type="text" id="vendorName" placeholder="Enter vendor name" class="w-full p-2 border rounded" required>
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-1">Email</label>
+              <input type="email" id="vendorEmail" placeholder="Enter email" class="w-full p-2 border rounded" required>
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-1">Phone Number</label>
+              <input type="text" id="vendorPhone" placeholder="Enter phone number" class="w-full p-2 border rounded" required>
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-1">Site</label>
+              <input type="text" id="vendorSite" placeholder="Enter site name" class="w-full p-2 border rounded" required>
+            </div>
+            <div class="md:col-span-2">
+              <button type="submit" class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-700">
+                Add Vendor
+              </button>
+            </div>
+          </form>
+
+          <!-- Table -->
+          <h3 class="text-xl font-semibold mb-4">Vendor List</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-green-700 text-white">
+                <tr>
+                  <th class="p-3">Vendor Name</th>
+                  <th class="p-3">Email</th>
+                  <th class="p-3">Phone Number</th>
+                  <th class="p-3">Site</th>
+                  <th class="p-3 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="vendorTableBody" class="divide-y">
+                <!-- Rows dynamically added -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    feather.replace();
+
+    const form = document.getElementById("vendorForm");
+    const tableBody = document.getElementById("vendorTableBody");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("vendorName").value;
+      const email = document.getElementById("vendorEmail").value;
+      const phone = document.getElementById("vendorPhone").value;
+      const site = document.getElementById("vendorSite").value;
+
+      const row = document.createElement("tr");
+      row.classList.add("hover:bg-gray-100");
+      row.innerHTML = `
+        <td class="p-3">${name}</td>
+        <td class="p-3">${email}</td>
+        <td class="p-3">${phone}</td>
+        <td class="p-3">${site}</td>
+        <td class="p-3 text-center">
+          <button class="deleteBtn bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+            Delete
+          </button>
+        </td>
+      `;
+
+      // Delete button functionality
+      row.querySelector(".deleteBtn").addEventListener("click", () => {
+        row.remove();
+      });
+
+      tableBody.appendChild(row);
+      form.reset();
+    });
+  </script>
+</body>
+</html>
