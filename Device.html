@@ -128,10 +128,100 @@
             </tbody>
           </table>
         </div>
+         <!-- Devices -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-blue-500 hover:shadow-2xl transition">
+          <h3 class="text-2xl font-bold mb-4">Devices</h3>
+          <table class="w-full mt-4 border">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="p-2 text-left">Device Name</th>
+                <th class="p-2 text-left">Device Alias</th>
+                <th class="p-2 text-left">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="hover:bg-gray-100 cursor-pointer" onclick="openDevice('FT_500718')">
+                <td class="p-2 text-blue-600 underline">FT_500718</td>
+                <td class="p-2">Gousiya nagara ultrasonic GPR tank</td>
+                <td class="p-2"><span class="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">Active</span></td>
+              </tr>
+              <tr class="hover:bg-gray-100 cursor-pointer" onclick="openDevice('FT_500961')">
+                <td class="p-2 text-blue-600 underline">FT_500961</td>
+                <td class="p-2">Udayagiri devanur tank</td>
+                <td class="p-2"><span class="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">Active</span></td>
+              </tr>
+              <tr class="hover:bg-gray-100 cursor-pointer" onclick="openDevice('FT_500166')">
+                <td class="p-2 text-blue-600 underline">FT_500166</td>
+                <td class="p-2">Jalpuri tank EMF</td>
+                <td class="p-2"><span class="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">Active</span></td>
+              </tr>
+              <tr class="hover:bg-gray-100 cursor-pointer" onclick="openDevice('FT_500711')">
+                <td class="p-2 text-blue-600 underline">FT_500711</td>
+                <td class="p-2">Halanahalli line GPR tank EMF</td>
+                <td class="p-2"><span class="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">Active</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
       </main>
     </div>
   </div>
 
-  <script>feather.replace()</script>
+  <script>feather.replace()
+     // Example device data with lat/lng and problem counts
+    const devices = {
+      FT_500718: { name: 'FT_500718', lat: 19.076, lng: 72.8777, problems: 2 },
+      FT_500961: { name: 'FT_500961', lat: 28.7041, lng: 77.1025, problems: 0 },
+      FT_500166: { name: 'FT_500166', lat: 21.1458, lng: 79.0882, problems: 2 },
+      FT_500711: { name: 'FT_500711', lat: 12.9716, lng: 77.5946, problems: 0 }
+    };
+    // Your Firebase config (console se copy karke paste karo)
+
+
+    let map;
+    let markers = {};
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 22.9734, lng: 78.6569 },
+        zoom: 5
+      });
+
+      for (let key in devices) {
+        const device = devices[key];
+        const marker = new google.maps.Marker({
+          position: { lat: device.lat, lng: device.lng },
+          map: map,
+          title: device.name
+        });
+        markers[key] = marker;
+      }
+    }
+
+    window.onload = function() {
+      initMap();
+      sortDisruptions();
+    }
+
+    function sortDisruptions() {
+      const tbody = document.querySelector('#disruptionTable tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.sort((a, b) => b.dataset.problems - a.dataset.problems);
+      rows.forEach(row => tbody.appendChild(row));
+    }
+
+    function openDevice(id) {
+      window.location = `Overviews.html?id=${id}`;
+      blinkMarker(id);
+    }
+
+    function blinkMarker(id) {
+      if (markers[id]) {
+        markers[id].setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => markers[id].setAnimation(null), 3000);
+      }
+    }
+  </script>
 </body>
 </html>
