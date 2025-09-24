@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
-  <title>Overview </title>
+  <title>Overview</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/feather-icons"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-900">
   <div class="flex h-screen">
@@ -25,28 +25,21 @@
         </h1>
       </div>
       <nav class="mt-4">
-       <a href="Dashboard.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
-  <i data-feather="bar-chart-2" class="mr-3"></i> Dashboard
-</a>
-
-
-           <a href="Device.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
-  <i data-feather="user" class="mr-3"></i> Device
-</a>
-
-           <a href="Report.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
-  <i data-feather="cpu" class="mr-3"></i> Report
-</a>
-
-           <a href="Alert.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
-  <i data-feather="bell" class="mr-3"></i> Alert
-</a>
-
-        <a href="Entry.html" class="flex items-center px-4 py-3 text-white-900 hover:bg-yellow-500 hover:text-purple-100" style="font-size: 22px;">
-  <i data-feather="book" class="mr-3"></i> Manual Entry
-</a>
-
-        
+        <a href="Dashboard.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="bar-chart-2" class="mr-3"></i> Dashboard
+        </a>
+        <a href="Device.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="user" class="mr-3"></i> Device
+        </a>
+        <a href="Report.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="cpu" class="mr-3"></i> Report
+        </a>
+        <a href="Alert.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="bell" class="mr-3"></i> Alert
+        </a>
+        <a href="Entry.html" class="flex items-center px-4 py-3 hover:bg-yellow-500" style="font-size: 22px;">
+          <i data-feather="book" class="mr-3"></i> Manual Entry
+        </a>
       </nav>
     </div>
 
@@ -54,360 +47,155 @@
     <div class="flex-1 flex flex-col">
       <!-- Header -->
       <header class="p-4 flex items-center justify-left bg-gradient-to-r from-green-400 via-yellow-300 to-red-400">
-        <h2 class="text-3xl font-bold">Overview Dashboard</h2>
+        <h2 id="deviceTitle" class="text-2xl font-bold"></h2>
       </header>
 
-      <!-- Filters -->
-  
+      <!-- Top Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
 
-     <!-- Top Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-  
- <!-- DG Status -->
-<div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-yellow-500 hover:shadow-2xl transition">
+        <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-yellow-500 hover:shadow-2xl transition">
   <h1 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
     <i data-feather="cpu" class="mr-2 text-green-600"></i> DG Status
   </h1>
-
-  <!-- Status Message -->
-  <div id="dgMessage" class="mt-4 p-3 rounded-lg text-center text-grey font-bold">
-    Checking status...
+  <div id="dgMessage" class="mt-4 p-3 rounded-lg text-center font-bold bg-gray-200">
+    Loading...
   </div>
 </div>
-<script>
-function randomDGStatus() {
-  const messageBox = document.getElementById('dgMessage');
 
-  // Possible random responses
-  const messages = [
-    { text: "✅ All OK. No action needed.", class: "bg-green-500 text-white" },
-    { text: "⚠️ Fuel level low, please refill.", class: "bg-yellow-500 text-white" },
-    { text: "🚨 Critical issue detected! Immediate check required.", class: "bg-red-500 text-white" },
-    { text: "ℹ️ Routine maintenance recommended soon.", class: "bg-blue-500 text-white" },
-    { text: "⚡ Power fluctuation noticed, monitor closely.", class: "bg-orange-500 text-white" }
-  ];
+<!-- Disruptions -->
+<div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-red-500 hover:shadow-2xl transition">
+  <h3 class="text-2xl font-bold mb-3">Disruptions</h3>
+  <ul id="disruptionsList" class="space-y-3">
+    <!-- Dynamic data from Firebase -->
+  </ul>
+</div>
+        <!-- Vendor Activity -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-green-500">
+          <h3 class="text-2xl font-bold mb-3">Vendor Activity</h3>
+          <canvas id="vendorChart"></canvas>
+        </div>
 
-  // Pick random message
-  const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+        <!-- Fuel -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-blue-500 hover:shadow-2xl transition">
+  <h3 class="text-2xl font-bold mb-3">Fuel (Diesel Delta)</h3>
+  <div id="fuelInfo" class="space-y-2 text-lg bg-gray-100 p-4 rounded-lg shadow-inner">Loading...</div>
+</div>
 
-  // Update UI
-  messageBox.textContent = randomMsg.text;
-  messageBox.className = `mt-4 p-3 rounded-lg text-center font-semibold ${randomMsg.class}`;
-}
-
-// Run after page load
-window.addEventListener("load", () => {
-  randomDGStatus(); // first message
-  setInterval(randomDGStatus, 5000); // update every 5 sec
-});
-</script>
-
-
-
-  <!-- Disruptions -->
-  <!-- DG Health Card -->
-<div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-red-500 hover:shadow-2xl transition cursor-pointer" 
-     onclick="document.getElementById('dgModal').classList.remove('hidden')">
-  <h3 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
-    <i data-feather="cpu" class="mr-2 text-green-600"></i>Disruptions
-  </h3>
-  <div class="space-y-3">
-    <div class="flex items-center">
-      <span class="w-5 h-5 bg-green-500 rounded-full mr-2"></span>
-      <p class="text-base">Power Supply: <span class="font-bold text-green-700 text-lg">Normal</span></p>
-    </div>
-    <div class="flex items-center">
-      <span class="w-5 h-5 bg-yellow-500 rounded-full mr-2"></span>
-      <p class="text-base">Fuel Level: <span class="font-bold text-yellow-600 text-lg ">Low (30%)</span></p>
-    </div>
-    <div class="flex items-center">
-      <span class="w-5 h-5 bg-red-500 rounded-full mr-2"></span>
-      <p class="text-base">Oil Pressure: <span class="font-bold text-red-600 text-lg">Critical</span></p>
-    </div>
-    <div class="flex items-center">
-      <span class="w-5 h-5 bg-green-500 rounded-full mr-2"></span>
-      <p class="text-base">Temperature: <span class="font-bold text-green-700 text-lg">Normal (45°C)</span></p>
-    </div>
-    <div class="flex items-center">
-      <span class="w-5 h-5 bg-green-500 rounded-full mr-2"></span>
-      <p class="text-base">Battery Status: <span class="font-bold text-green-700 text-lg">Charged</span></p>
-    </div>
-
-    <!-- Health Indicator -->
-    <div class="mt-4">
-      <p class="text-2xl text-gray-500 mb-1">Overall Health</p>
-      <div class="w-full bg-gray-200 rounded-full h-2">
-        <div class="bg-green-500 h-2 rounded-full" style="width: 60%;"></div>
       </div>
-      <p class="text-2xl mt-1 text-gray-600 text-lg">60% Systems Healthy</p>
-    </div>
-  </div>
-</div>
 
-<!-- Modal for Details -->
-<div id="dgModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-  <div class="bg-white rounded-xl shadow-lg w-11/12 md:w-2/3 p-6 relative">
-    <h2 class="text-lg font-bold text-gray-800 mb-4">DG Sensor Report</h2>
-    <button onclick="document.getElementById('dgModal').classList.add('hidden')" 
-            class="absolute top-3 right-3 text-gray-500 hover:text-red-500">
-      ✖
-    </button>
-
-    <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
-      <thead class="bg-purple-900 text-white">
-        <tr>
-          <th class="py-2 px-4 text-left">Parameter</th>
-          <th class="py-2 px-4 text-left">Status</th>
-          <th class="py-2 px-4 text-left">Value</th>
-          <th class="py-2 px-4 text-left">Last Updated</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200">
-        <tr>
-          <td class="py-2 px-4">Power Supply</td>
-          <td class="py-2 px-4"><span class="px-2 py-1 text-xs bg-green-100 text-green-600 rounded-full">Normal</span></td>
-          <td class="py-2 px-4">220V</td>
-          <td class="py-2 px-4">2025-09-17 11:30</td>
-        </tr>
-        <tr>
-          <td class="py-2 px-4">Fuel Level</td>
-          <td class="py-2 px-4"><span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-600 rounded-full">Low</span></td>
-          <td class="py-2 px-4">30%</td>
-          <td class="py-2 px-4">2025-09-17 11:30</td>
-        </tr>
-        <tr>
-          <td class="py-2 px-4">Oil Pressure</td>
-          <td class="py-2 px-4"><span class="px-2 py-1 text-xs bg-red-100 text-red-600 rounded-full">Critical</span></td>
-          <td class="py-2 px-4">1.2 bar</td>
-          <td class="py-2 px-4">2025-09-17 11:30</td>
-        </tr>
-        <tr>
-          <td class="py-2 px-4">Temperature</td>
-          <td class="py-2 px-4"><span class="px-2 py-1 text-xs bg-green-100 text-green-600 rounded-full">Normal</span></td>
-          <td class="py-2 px-4">45°C</td>
-          <td class="py-2 px-4">2025-09-17 11:30</td>
-        </tr>
-        <tr>
-          <td class="py-2 px-4">Battery</td>
-          <td class="py-2 px-4"><span class="px-2 py-1 text-xs bg-green-100 text-green-600 rounded-full">Charged</span></td>
-          <td class="py-2 px-4">12.6V</td>
-          <td class="py-2 px-4">2025-09-17 11:30</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-
-  <!-- Vendor Activity -->
-  <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-green-500 hover:shadow-2xl transition">
-    <h3 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
-      <i data-feather="users" class="mr-2 text-yellow-600 text-lg"></i> Vendor Activity
-    </h3>
-    <canvas id="vendorChart"></canvas>
-    <p class="text-2xl text-gray-500 mt-2 text-center">Fuel refill, maintenance, network fix etc.</p>
-  </div>
-
-  <!-- Fuel -->
-  <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-blue-500 hover:shadow-2xl transition">
-    <h3 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
-      <i data-feather="battery-charging" class="mr-2 text-blue-600 text-lg"></i> Fuel (Diesel Delta)
-    </h3>
-
- 
-
-  <!-- Vendor Dropdown -->
-  <label class="block text-base text-gray-600 mb-2">Select Vendor:</label>
-  <select id="vendorSelect" class="w-full p-2 border rounded mb-4">
-    <option value="">-- Select Vendor --</option>
-    <option value="vendor1">ABC Power Services</option>
-    <option value="vendor2">XYZ Diesel Supply</option>
-    <option value="vendor3">Green Energy Ltd</option>
-    <option value="vendor4">Shakti Fuels</option>
-    <option value="vendor5">MahaPower Vendor</option>
-    <option value="vendor6">Fuel & Go</option>
-    <option value="vendor7">Reliance Energy</option>
-    <option value="vendor8">City Fuel Corp</option>
-    <option value="vendor9">Sunrise Power</option>
-    <option value="vendor10">Metro Fuels</option>
-  </select>
-
-  <!-- Fuel Info -->
-  <div id="fuelInfo" class="space-y-2 text-2xl text-gray-700 hidden border-t pt-3">
-    <p><span class="font-semibold">Vendor:</span> <span id="vendorName"></span></p>
-    <p><span class="font-semibold">DG Number:</span> <span id="dgNumber"></span></p>
-    <p><span class="font-semibold">Before:</span> <span id="fuelBefore"></span></p>
-    <p><span class="font-semibold">After:</span> <span id="fuelAfter"></span></p>
-    <p><span class="font-semibold">Delta:</span> <span id="fuelDelta" class="font-bold text-blue-700"></span></p>
-    <p><span class="font-semibold">Time:</span> <span id="fuelTime" class="text-gray-600"></span></p>
-  </div>
-</div>
-
-<script>
- 
-  // Vendor Fuel Data (sample static with time)
-  const vendorData = {
-    vendor1: { name: "ABC Power Services", dg: "DG-101", before: "300L", after: "500L", delta: "+200L", time: "2025-09-17 11:30 AM" },
-    vendor2: { name: "XYZ Diesel Supply", dg: "DG-102", before: "400L", after: "650L", delta: "+250L", time: "2025-09-17 01:15 PM" },
-    vendor3: { name: "Green Energy Ltd", dg: "DG-103", before: "250L", after: "400L", delta: "+150L", time: "2025-09-17 02:45 PM" },
-    vendor4: { name: "Shakti Fuels", dg: "DG-104", before: "200L", after: "350L", delta: "+150L", time: "2025-09-17 03:20 PM" },
-    vendor5: { name: "MahaPower Vendor", dg: "DG-105", before: "500L", after: "800L", delta: "+300L", time: "2025-09-17 04:00 PM" },
-    vendor6: { name: "Fuel & Go", dg: "DG-106", before: "320L", after: "470L", delta: "+150L", time: "2025-09-17 04:30 PM" },
-    vendor7: { name: "Reliance Energy", dg: "DG-107", before: "450L", after: "600L", delta: "+150L", time: "2025-09-17 05:00 PM" },
-    vendor8: { name: "City Fuel Corp", dg: "DG-108", before: "280L", after: "500L", delta: "+220L", time: "2025-09-17 05:45 PM" },
-    vendor9: { name: "Sunrise Power", dg: "DG-109", before: "350L", after: "550L", delta: "+200L", time: "2025-09-17 06:15 PM" },
-    vendor10:{ name: "Metro Fuels", dg: "DG-110", before: "600L", after: "900L", delta: "+300L", time: "2025-09-17 07:00 PM" },
-  };
-
-  document.getElementById("vendorSelect").addEventListener("change", function() {
-    const vendor = this.value;
-    const infoBox = document.getElementById("fuelInfo");
-    if (vendor && vendorData[vendor]) {
-      infoBox.classList.remove("hidden");
-      document.getElementById("vendorName").innerText = vendorData[vendor].name;
-      document.getElementById("dgNumber").innerText = vendorData[vendor].dg;
-      document.getElementById("fuelBefore").innerText = vendorData[vendor].before;
-      document.getElementById("fuelAfter").innerText = vendorData[vendor].after;
-      document.getElementById("fuelDelta").innerText = vendorData[vendor].delta;
-      document.getElementById("fuelTime").innerText = vendorData[vendor].time;
-    } else {
-      infoBox.classList.add("hidden");
-    }
-  });
-</script>
-</div>
-
-        <!-- IoT Graphs -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <!-- Time vs Power -->
-          <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-2xl font-semibold text-gray-800 mb-5">
-              <i data-feather="activity" class="inline mr-2 text-purple-600 text-lg"></i>
-              Time vs Power
-            </h3>
-            <canvas id="timePowerChart"></canvas>
-          </div>
-
-          <!-- Fuel vs Power -->
-          <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-2xl font-semibold text-gray-800 mb-5">
-              <i data-feather="battery-charging" class="inline mr-2 text-yellow-600 text-lg"></i>
-              Fuel vs Power
-            </h3>
-            <canvas id="fuelPowerChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Device Status Table -->
+      <!-- Graphs -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div class="bg-white rounded-lg shadow-md p-6">
-          <h3 class="text-2xl font-semibold text-gray-800 mb-5">Device Status</h3>
-          <table class="min-w-full border border-gray-200 rounded-lg">
-            <thead class="bg-yellow-700 text-white text-lg">
-              <tr>
-                <th class="py-2 px-4 text-left">Device ID</th>
-                <th class="py-2 px-4 text-left">Site</th>
-                <th class="py-2 px-4 text-left">Location</th>
-                <th class="py-2 px-4 text-left">Status</th>
-                <th class="py-2 px-4 text-left">Last Ping</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-t">
-                <td class="py-2 px-4">D-101</td>
-                <td class="py-2 px-4">Site 1</td>
-                <td class="py-2 px-4">Nagpur</td>
-                <td class="py-2 px-4 text-green-600 font-bold">Online</td>
-                <td class="py-2 px-4">2 min ago</td>
-              </tr>
-             
-            </tbody>
-          </table>
+          <h3 class="text-2xl font-semibold mb-3">Time vs Power</h3>
+          <canvas id="timePowerChart"></canvas>
         </div>
-      </main>
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-2xl font-semibold mb-3">Fuel vs Power</h3>
+          <canvas id="fuelPowerChart"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-  feather.replace();
+    feather.replace();
 
-  // Vendor Activity Chart
-  const ctx = document.getElementById('vendorChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Fuel Refill', 'Maintenance', 'Network Fix'],
-      datasets: [{
-        data: [5, 3, 2],
-        backgroundColor: ['#10B981', '#F59E0B', '#3B82F6']
-      }]
-    },
-    options: { 
-      responsive: true, 
-      plugins: { 
-        legend: { 
-          position: 'bottom',
-          labels: { font: { size: 16 } } // font size increased
-        } 
-      } 
-    }
-  });
+    // Firebase Init
+    const firebaseConfig = {
+      apiKey: "AIzaSyB4yz1uGoIsdGskjpw8Sd_l11DRwEp9bm8",
+      authDomain: "dashboard-5ad70.firebaseapp.com",
+      databaseURL: "https://dashboard-5ad70-default-rtdb.firebaseio.com",
+      projectId: "dashboard-5ad70",
+      storageBucket: "dashboard-5ad70.firebasestorage.app",
+      messagingSenderId: "271639896344",
+      appId: "1:271639896344:web:fdc6b2d3820b099f96be6d",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-  // Time vs Power Chart
-  const timeCtx = document.getElementById('timePowerChart').getContext('2d');
-  new Chart(timeCtx, {
-    type: 'line',
-    data: {
-      labels: ['10AM', '11AM', '12PM', '1PM', '2PM', '3PM'],
-      datasets: [{
-        label: 'Power (kW)',
-        data: [20, 35, 30, 40, 45, 50],
-        borderColor: '#8B5CF6',
-        backgroundColor: 'rgba(139,92,246,0.2)',
-        tension: 0.4,
-        fill: true
-      }]
-    },
-    options: { 
-      responsive: true, 
-      plugins: { 
-        legend: { display: true, labels: { font: { size: 16 } } } // font size increased
-      },
-      scales: {
-        x: { 
-          ticks: { font: { size: 14 } } // X-axis font size
-        },
-        y: { 
-          ticks: { font: { size: 14 } } // Y-axis font size
-        }
+    // Get Device from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const deviceId = urlParams.get("id");
+    const deviceAlias = urlParams.get("alias") || "Unknown Device";
+    document.getElementById("deviceTitle").textContent = `${deviceAlias} (${deviceId})`;
+
+    // Charts
+    const timeCtx = document.getElementById("timePowerChart").getContext("2d");
+    const timePowerChart = new Chart(timeCtx, {
+      type: "line",
+      data: { labels: [], datasets: [{ label: "Power (kW)", data: [], borderColor: "#8B5CF6", fill: true }] },
+      options: { responsive: true }
+    });
+
+    const fuelCtx = document.getElementById("fuelPowerChart").getContext("2d");
+    const fuelPowerChart = new Chart(fuelCtx, {
+      type: "bar",
+      data: { labels: ["Fuel Added", "Fuel Consumed", "Power Generated"], datasets: [{ data: [0,0,0], backgroundColor: ["#F59E0B", "#EF4444", "#10B981"] }] },
+      options: { responsive: true }
+    });
+
+    const vendorCtx = document.getElementById("vendorChart").getContext("2d");
+    const vendorChart = new Chart(vendorCtx, {
+      type: "doughnut",
+      data: { labels: ["Fuel Refill", "Maintenance", "Network Fix"], datasets: [{ data: [0,0,0], backgroundColor: ["#10B981", "#F59E0B", "#3B82F6"] }] }
+    });
+
+    // Realtime Firebase Listener
+    const deviceRef = db.ref("devices/" + deviceId);
+  deviceRef.on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+
+    // DG Status
+    const dgBox = document.getElementById("dgMessage");
+    dgBox.textContent = data.dgStatus || "Status Unknown";
+    dgBox.className = "mt-4 p-3 rounded-lg text-center font-bold " +
+      (data.dgStatus.includes("Critical") ? "bg-red-500 text-white" :
+       data.dgStatus.includes("fluctuation") ? "bg-orange-500 text-white" :
+       data.dgStatus.includes("low") ? "bg-yellow-500 text-white" :
+       "bg-green-500 text-white");
+
+    // Disruptions
+    const disruptions = document.getElementById("disruptionsList");
+    disruptions.innerHTML = `
+      <li class="p-2 rounded ${data.power === "Normal" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}">⚡ Power: ${data.power}</li>
+      <li class="p-2 rounded ${data.fuel.includes("Low") ? "bg-yellow-100 text-yellow-700" : "bg-green-100 text-green-700"}">⛽ Fuel: ${data.fuel}</li>
+      <li class="p-2 rounded ${data.oil === "Critical" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}">🛢️ Oil: ${data.oil}</li>
+      <li class="p-2 rounded bg-blue-100 text-blue-700">🌡️ Temp: ${data.temp}</li>
+      <li class="p-2 rounded bg-purple-100 text-purple-700">🔋 Battery: ${data.battery}</li>
+    `;
+
+    // Fuel Info
+    document.getElementById("fuelInfo").innerHTML = `
+      <p><span class="font-semibold">Vendor:</span> ${data.vendor || "-"}</p>
+      <p><span class="font-semibold">Before:</span> ${data.fuelBefore || "-"} L</p>
+      <p><span class="font-semibold">After:</span> ${data.fuelAfter || "-"} L</p>
+      <p><span class="font-semibold">Delta:</span> <span class="font-bold text-blue-700">${data.fuelDelta || "-"}</span></p>
+    `;
+  
+      // Charts update
+      timePowerChart.data.labels.push(new Date().toLocaleTimeString());
+      timePowerChart.data.datasets[0].data.push(data.powerKW || 0);
+      if (timePowerChart.data.labels.length > 10) {
+        timePowerChart.data.labels.shift();
+        timePowerChart.data.datasets[0].data.shift();
       }
-    }
-  });
+      timePowerChart.update();
 
-  // Fuel vs Power Chart
-  const fuelCtx = document.getElementById('fuelPowerChart').getContext('2d');
-  new Chart(fuelCtx, {
-    type: 'bar',
-    data: {
-      labels: ['Fuel Added', 'Fuel Consumed', 'Power Generated'],
-      datasets: [{
-        label: 'Liters / kW',
-        data: [200, 150, 180],
-        backgroundColor: ['#F59E0B', '#EF4444', '#10B981']
-      }]
-    },
-    options: { 
-      responsive: true, 
-      plugins: { 
-        legend: { display: true, labels: { font: { size: 16 } } } // font size increased
-      },
-      scales: {
-        x: { ticks: { font: { size: 14 } } },
-        y: { ticks: { font: { size: 14 } } }
-      }
-    }
-  });
-    
-</script>
+      fuelPowerChart.data.datasets[0].data = [
+        data.fuelAdded || 0,
+        data.fuelConsumed || 0,
+        data.powerKW || 0
+      ];
+      fuelPowerChart.update();
 
+      vendorChart.data.datasets[0].data = [
+        data.vendorFuel || 0,
+        data.vendorMaintenance || 0,
+        data.vendorNetwork || 0
+      ];
+      vendorChart.update();
+    });
+  </script>
 </body>
 </html>
